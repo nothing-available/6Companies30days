@@ -1,35 +1,55 @@
-class Solution {
-public:
-    
-//     take advantage of ordered set
-    typedef tree<pair<int,int>, null_type, less<pair<int,int>>, rb_tree_tag, 
-            tree_order_statistics_node_update> 
-    ordered_set; 
-    
-    
-    long long f(vector<long long>& vt,  long long n, long long k)
+class Solution 
 {
-     long long count=0;
-         ordered_set mySet;
-        for(long long i=0;i<n;++i){
-           
-           
-            count+=mySet.order_of_key({vt[i]+k,INT_MAX});
-              mySet.insert({vt[i],i});  
-        }
- 
-    return count;
-}
-    long long numberOfPairs(vector<int>& nums1, vector<int>& nums2, int diff) {
+public:
+
+    long long int count;
+   
+    void checkCount(vector<int>& nums, int start, int mid, int end,int d)
+    {
+
         
-        // cout<<endl;
-        long long n=nums1.size();
-        vector<long long> vt(n);
-        for(long long i=0;i<n;++i){
-            vt[i]=nums1[i]-nums2[i];
+        int l = start, r = mid + 1;
+        while(l <= mid && r <= end)
+        {
+            if(nums[l]<=(nums[r]+d))  // if (nums[l]<=nums[r]+d) then all values from nums[r] to nums[end] will be be having their summation with d greater than or equal to nums[l]
+            {
+                count += (end - r+1);
+                l++;
+            }
+            else      // otherwise we need to increment r so that we can find match for nums[l]
+            {
+                r++;
+            }
         }
-        // sort(begin(vt),end(vt));
-        return f(vt,n,diff);
+         // sort all values from start to end
+        sort(nums.begin() + start, nums.begin() + end + 1);  // (Sort using two-pointers for better time complexity)
+        return;
+         
+    }
+    void mergeSort(vector<int>& nums, int start, int end,int d)
+    {
+        if(start == end) 
+            return;
         
+        int mid = (start + end)/2;
+        mergeSort(nums,start, mid,d);
+        mergeSort(nums,mid+1,end,d);
+        
+        checkCount(nums,start,mid,end,d);
+        return;
+        
+    }
+    long long numberOfPairs(vector<int>& a, vector<int>& b, int d) 
+    {
+        count = 0;
+        int n = a.size();
+        vector<int>c(n);  
+        
+        for(int i=0;i<n;i++)
+        c[i]=a[i]-b[i];               
+			
+        mergeSort(c,0,n-1,d);
+		
+        return count;
     }
 };
